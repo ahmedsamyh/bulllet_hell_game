@@ -11,7 +11,7 @@ bool Sprite_init(Sprite* spr, Texture2D texture, size_t hframes, size_t vframes)
   spr->height = (float)spr->texture.height;
   spr->scale = (Vector2) {1.f, 1.f};
   spr->tex_rect.width = spr->width / (float)spr->hframes;
-  spr->tex_rect.width = spr->height / (float)spr->vframes;
+  spr->tex_rect.height = spr->height / (float)spr->vframes;
   Sprite_set_hframe(spr, 1);
   Sprite_set_vframe(spr, 0);
   spr->tint = WHITE;
@@ -48,8 +48,18 @@ void Sprite_center_origin(Sprite* spr) {
 }
 
 void Sprite_draw(Sprite* spr) {
-    //void DrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint); // Draw a part of a texture defined by a rectangle with 'pro' parameters
-    DrawTexturePro(spr->texture,
+    Rectangle dest = {
+        .x = spr->pos.x,
+        .y = spr->pos.y,
+        .width  = spr->tex_rect.width * spr->scale.x,
+        .height = spr->tex_rect.height * spr->scale.y,
+    };
+    Vector2 origin = CLITERAL(Vector2) {
+        .x = spr->origin.x * spr->scale.x,
+        .y = spr->origin.y * spr->scale.y,
+    };
+    DrawTexturePro(spr->texture, spr->tex_rect, dest, origin, spr->rotation, spr->tint);
+    /* DrawTexture(spr->texture, spr->pos.x, spr->pos.y, spr->tint); */
 }
 
 void Sprite_animate_hframe(Sprite* spr, float delta) {

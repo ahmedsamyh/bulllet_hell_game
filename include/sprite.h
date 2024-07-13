@@ -4,13 +4,14 @@
 #include <raylib.h>
 #include <stdlib.h>
 
-#define SPRITE_DEFAULT_TIME_PER_FRAME 0.25f // seconds
+#define SPRITE_DEFAULT_TIME_PER_FRAME 0.1f // seconds
 
 typedef struct {
   Texture2D texture;
   Rectangle tex_rect;
   Vector2 pos;
   float width, height;
+  float rotation;
   Vector2 origin;
   Vector2 scale;
   bool vflip, hflip;
