@@ -18,15 +18,25 @@ int main(void) {
     }
 
     Arena str_arena = Arena_make(0);
+    Camera2D cam = {
+        .offset = {0},
+        .target = {WIDTH*0.5f, HEIGHT*0.5f},
+        .rotation = 0.f,
+        .zoom = 2.f,
+    };
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
             ClearBackground(GRAY);
             /* float delta = GetFrameTime(); */
-            /* Vector2 mpos = GetMousePosition(); */
+            Vector2 mposs = GetMousePosition();
+            Vector2 mposw = GetScreenToWorld2D(mposs, cam);
+            e.pos = mposw;
 
-            Entity_draw(&e);
+            BeginMode2D(cam);
+                Entity_draw(&e);
+            EndMode2D();
             draw_fps(&str_arena);
         EndDrawing();
     }

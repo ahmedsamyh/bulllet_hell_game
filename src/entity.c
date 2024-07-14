@@ -8,6 +8,11 @@ bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes) {
    Sprite_center_origin(&this->spr);
    this->speed = ENTITY_DEFAULT_SPEED;
 
+   this->keys[ECK_RIGHT] = KEY_RIGHT;
+   this->keys[ECK_LEFT]  = KEY_LEFT;
+   this->keys[ECK_UP]    = KEY_UP;
+   this->keys[ECK_DOWN]  = KEY_DOWN;
+
    return true;
 }
 
