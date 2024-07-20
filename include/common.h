@@ -2,6 +2,7 @@
 #define _COMMON_H_
 
 #include <raylib.h>
+#include <bullet.h>
 #include <commonlib.h>
 
 #define panic(fmt, ...) \
@@ -13,5 +14,7 @@ static int Y = 0;
 void draw_fps(Arena* str_arena);
 void begin_text_line(void);
 void draw_text_line(const char *text, int fontSize, Color color);
+
+void add_bullet(Bullet** bullets, Vector2 pos, Bullet_type type);
 
 #endif // _COMMON_H_

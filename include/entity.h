@@ -4,25 +4,22 @@
 #include <raylib.h>
 #include <sprite.h>
 #include <commonlib.h>
+#include <config.h>
 
 STRUCT(Entity);
 ENUM(Entity_Control_Key);
-
-#define ENTITY_DEFAULT_SPEED 200.f
 
 enum Entity_Control_Key {
         ECK_LEFT,
         ECK_RIGHT,
         ECK_DOWN,
         ECK_UP,
+        ECK_FIRE,
         ECK_COUNT,
 };
 
 struct Entity {
-    KeyboardKey keys[ECK_COUNT];
-    Vector2 pos, vel, acc, dir;
-    float speed;
-    Sprite spr;
+    ENTITY_MEMBERS();
 };
 
 bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes);

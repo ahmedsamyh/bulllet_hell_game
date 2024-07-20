@@ -16,14 +16,14 @@ bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes) {
    return true;
 }
 
-void Entity_control_physics(Entity* this, float delta) {
-    this->vel = Vector2Scale(this->dir, this->speed);
+void Entity_physics(Entity* this, float delta) {
+    this->vel = Vector2Add(this->vel, this->acc);
     this->pos = Vector2Add(this->pos, Vector2Scale(this->vel, delta));
     this->acc = Vector2Scale(this->acc, 0.f);
 }
 
-void Entity_physics(Entity* this, float delta) {
-    this->vel = Vector2Add(this->vel, this->acc);
+void Entity_control_physics(Entity* this, float delta) {
+    this->vel = Vector2Scale(this->dir, this->speed);
     this->pos = Vector2Add(this->pos, Vector2Scale(this->vel, delta));
     this->acc = Vector2Scale(this->acc, 0.f);
 }

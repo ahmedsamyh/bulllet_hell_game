@@ -14,3 +14,7 @@ void draw_fps(Arena* str_arena) {
     cstr fps_str = Arena_alloc_str(*str_arena, "%dFPS", GetFPS());
     draw_text_line(fps_str, 20, WHITE);
 }
+
+void add_bullet(Bullet** bullets, Vector2 pos, Bullet_type type) {
+    Bullet b = {0};
+}
