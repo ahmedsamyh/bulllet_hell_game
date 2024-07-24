@@ -2,27 +2,31 @@
 #include <raymath.h>
 
 bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes) {
-   if (!Sprite_init(&this->spr, tex, hframes, vframes)) {
+    if (!Sprite_init(&this->spr, tex, hframes, vframes)) {
        return false;
-   }
-   Sprite_center_origin(&this->spr);
-   this->speed = ENTITY_DEFAULT_SPEED;
+    }
+    Sprite_center_origin(&this->spr);
+    this->speed = ENTITY_DEFAULT_SPEED;
+    this->spawning = true;
+    this->spr.scale = CLITERAL(Vector2) {2.f, 2.f};
 
-   this->keys[ECK_RIGHT] = KEY_D;
-   this->keys[ECK_LEFT]  = KEY_A;
-   this->keys[ECK_UP]    = KEY_W;
-   this->keys[ECK_DOWN]  = KEY_S;
+    this->keys[ECK_RIGHT] = KEY_D;
+    this->keys[ECK_LEFT]  = KEY_A;
+    this->keys[ECK_UP]    = KEY_W;
+    this->keys[ECK_DOWN]  = KEY_S;
 
-   return true;
+    return true;
 }
 
-void Entity_physics(Entity* this, float delta) {
+void Entity_physics(Entity* this) {
+    float delta = GetFrameTime();
     this->vel = Vector2Add(this->vel, this->acc);
     this->pos = Vector2Add(this->pos, Vector2Scale(this->vel, delta));
     this->acc = Vector2Scale(this->acc, 0.f);
 }
 
-void Entity_control_physics(Entity* this, float delta) {
+void Entity_control_physics(Entity* this) {
+    float delta = GetFrameTime();
     this->vel = Vector2Scale(this->dir, this->speed);
     this->pos = Vector2Add(this->pos, Vector2Scale(this->vel, delta));
     this->acc = Vector2Scale(this->acc, 0.f);
@@ -34,7 +38,6 @@ void Entity_apply_force(Entity* this, Vector2 force) {
 
 void Entity_update(Entity* this) {
     (void)this;
-
 }
 
 void Entity_control(Entity* this) {
@@ -58,6 +61,28 @@ void Entity_control(Entity* this) {
 void Entity_draw(Entity* this) {
     this->spr.pos = this->pos;
     Sprite_draw(&this->spr);
+}
+
+void Entity_spawn(Entity* this) {
+    ASSERT(!this->spawned);
+    float scl = this->spr.scale.x;
+    scl -= (scl - 1.f) * GetFrameTime() * 10.f;
+    this->spr.scale = CLITERAL(Vector2) {scl, scl};
+    if (fabsf(scl - 1.f) < 0.01f) {
+        this->spawned = true;
+        this->spawning = false;
+    }
+}
+
+void Entity_despawn(Entity* this) {
+    ASSERT(!this->despawned);
+    float scl = this->spr.scale.x;
+    scl -= (scl - 2.f) * GetFrameTime() * 10.f;
+    this->spr.scale = CLITERAL(Vector2) {scl, scl};
+    if (fabsf(scl - 2.f) <= 0.01f) {
+        this->despawned = true;
+        this->despawning = false;
+    }
 }
 
 void Entity_deinit(Entity* this) {
