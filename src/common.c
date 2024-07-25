@@ -22,5 +22,5 @@ void add_bullet(Bullet** bullets, Texture2D* textures, Vector2 pos, Bullet_type 
     }
     b.pos = pos;
     arrput(*bullets, b);
-    log_info("Spawn bullet %u", arrlenu(*bullets));
+    /* log_info("Spawn bullet %u", arrlenu(*bullets)); */
 }

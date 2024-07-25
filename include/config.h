@@ -11,7 +11,8 @@
     float speed;\
     Sprite spr;\
     bool despawned, despawning;\
-    bool spawned, spawning
+    bool spawned, spawning;\
+    float hitbox
 
 #define PLAYER_DEFAULT_SPEED 200.f
 #define PLAYER_FIRE_RATE 0.01f

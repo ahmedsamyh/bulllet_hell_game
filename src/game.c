@@ -72,6 +72,7 @@ int main(void) {
                 }
             }
 
+            /////////////////////DRAW/////////////////////////
             Player_draw(&player);
 
             for (int i = arrlenu(bullets)-1; i >= 0; --i) {
