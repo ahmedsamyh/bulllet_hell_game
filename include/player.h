@@ -9,7 +9,6 @@ STRUCT(Player);
 
 struct Player {
     ENTITY_MEMBERS();
-    Alarm fire_alarm;
 };
 
 bool Player_init(Player* this, Texture2D tex, size_t hframes, size_t vframes);

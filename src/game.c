@@ -6,6 +6,7 @@
 #include <entity.h>
 #include <player.h>
 #include <bullet.h>
+#include <enemy.h>
 #include <common.h>
 
 #define COMMONLIB_IMPLEMENTATION
@@ -14,7 +15,9 @@
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Game");
 
-    Bullet* bullets = NULL;
+    Bullet* bullets = NULL; // dynamic-array
+    Texture2D* bullet_textures = NULL; // dynamic-array
+    Enemy* enemies  = NULL; // dynamic-array
 
     Rectangle play_rect = {
         .x = 20.f,
@@ -24,7 +27,6 @@ int main(void) {
     };
 
     Arena str_arena = Arena_make(0);
-    Texture2D* bullet_textures = NULL;
 
     for (int i = 0; i < 1; ++i) {
         Arena_reset(&str_arena);
@@ -51,13 +53,24 @@ int main(void) {
         BeginDrawing();
             ClearBackground(GRAY);
             float delta = GetFrameTime();
-            /* Vector2 mpos = GetMousePosition(); */
+            Vector2 mpos = GetMousePosition();
 
             Player_control(&player);
             Entity_control_physics((Entity*)&player);
             Player_update(&player);
             if (IsKeyDown(player.keys[ECK_FIRE])) {
                 Player_fire(&player, bullet_textures, &bullets);
+            }
+
+            // DEBUG
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                Enemy e = {0};
+                if (!Enemy_init(&e, tex, 1, 1)) {
+                    CloseWindow();
+                }
+                e.pos = mpos;
+                e.bullet_count = 100;
+                arrput(enemies, e);
             }
 
             // BULLET UPDATE
@@ -72,9 +85,29 @@ int main(void) {
                 }
             }
 
+            // ENEMY UPDATE
+            for (int i = arrlenu(enemies)-1; i >= 0; --i) {
+                Enemy* e = &enemies[i];
+                Enemy_update(e);
+                Enemy_fire(e, bullet_textures, &bullets);
+                if (!CheckCollisionPointRec(e->pos, play_rect)) {
+                    e->despawning = true;
+                }
+                if (e->despawned) {
+                    arrdel(enemies, i);
+                }
+            }
+
             /////////////////////DRAW/////////////////////////
             Player_draw(&player);
 
+            // ENEMY DRAW
+            for (int i = arrlenu(enemies)-1; i >= 0; --i) {
+                Enemy* e = &enemies[i];
+                Enemy_draw(e);
+            }
+
+            // BULLET DRAW
             for (int i = arrlenu(bullets)-1; i >= 0; --i) {
                 Bullet* b = &bullets[i];
                 Bullet_draw(b);
@@ -92,6 +125,7 @@ int main(void) {
     }
 
     arrfree(bullets);
+    arrfree(enemies);
     arrfree(bullet_textures);
     Player_deinit(&player);
     Arena_free(&str_arena);

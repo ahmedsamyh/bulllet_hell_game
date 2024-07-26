@@ -1,5 +1,6 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
+#include <timer.h>
 
 #define WIDTH 1280
 #define HEIGHT 960
@@ -12,6 +13,7 @@
     Sprite spr;\
     bool despawned, despawning;\
     bool spawned, spawning;\
+    Alarm fire_alarm;\
     float hitbox
 
 #define PLAYER_DEFAULT_SPEED 200.f
