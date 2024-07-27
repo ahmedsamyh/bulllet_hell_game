@@ -16,6 +16,7 @@ enum Bullet_type {
 struct Bullet {
     ENTITY_MEMBERS();
     float max_speed, min_speed;
+    float speed_delta;
     float angle;
     Bullet_type type;
 };
@@ -25,7 +26,7 @@ bool Bullet_init(Bullet* this, Texture2D* textures, Bullet_type type);
 void Bullet_set_type(Bullet* this, Texture2D* textures, Bullet_type type);
 void Bullet_update(Bullet* this);
 void Bullet_draw(Bullet* this);
-void Bullet_set_speed(Bullet* this, float min, float max, float curr);
+void Bullet_set_speed(Bullet* this, float min, float max, float curr, float delta);
 void Bullet_deinit(Bullet* this);
 
 #endif // __BULLET_H__

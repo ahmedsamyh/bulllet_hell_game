@@ -70,8 +70,23 @@ int main(void) {
                 }
                 e.pos = mpos;
                 e.bullet_count = 100;
+
+                if (IsKeyDown(KEY_ONE)) {
+                    e.pattern = pattern1;
+                }
+
+                if (IsKeyDown(KEY_TWO)) {
+                    e.pattern = pattern2;
+                }
+
                 arrput(enemies, e);
             }
+
+            /* if (IsKeyPressed(KEY_X)) { */
+            /*     for (int i = 0; i < arrlenu(enemies); ++i) { */
+            /*         enemies[i].despawning = true; */
+            /*     } */
+            /* } */
 
             // BULLET UPDATE
             for (int i = arrlenu(bullets)-1; i >= 0; --i) {

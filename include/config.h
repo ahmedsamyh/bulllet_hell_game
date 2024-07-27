@@ -22,4 +22,6 @@
 #define BULLET_DEFAULT_MIN_SPEED 0.f
 #define BULLET_DEFAULT_MAX_SPEED 500.f
 
+#define PATTERN(name) void name(Enemy* this,Texture2D* bullet_textures, Bullet** bullets)
+
 #endif // _CONFIG_H_
