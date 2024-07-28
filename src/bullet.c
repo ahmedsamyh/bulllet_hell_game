@@ -2,29 +2,33 @@
 #include <raymath.h>
 #include <momomath.h>
 
-bool Bullet_init(Bullet* this, Texture2D* textures, Bullet_type type) {
+bool Bullet_init(Bullet* this, Texture2D* textures, Bullet_type type, Bullet_color color) {
     Entity_init((Entity*)this, textures[0], 1, 1);
 
     Bullet_set_speed(this, BULLET_DEFAULT_MIN_SPEED, BULLET_DEFAULT_MAX_SPEED, ENTITY_DEFAULT_SPEED+randomf(-100.f, 100.f), 0.f);
-    Bullet_set_type(this, textures, type);
+    Bullet_set_type(this, textures, type, color);
     this->spr.scale = CLITERAL(Vector2) {2.f, 2.f};
 
     this->angle = randomf(0.f, 360.f);
     return true;
 }
 
-void Bullet_set_type(Bullet* this, Texture2D* textures, Bullet_type type) {
+void Bullet_set_type(Bullet* this, Texture2D* textures, Bullet_type type, Bullet_color color) {
     this->type = type;
     ASSERT(arrlenu(textures) <= BT_COUNT);
+    this->color = color;
     switch (this->type) {
         case BT_0: {
                        // TODO: check return
-                       Sprite_init(&this->spr, textures[BT_0], 1, 1);
+                       Sprite_init(&this->spr, textures[BT_0], BC_COUNT, 1);
+                       Sprite_center_origin(&this->spr);
                    } break;
         default: {
                      ASSERT(0 && "Unreachable!");
                  } break;
     }
+    Sprite_set_hframe(&this->spr, (int)this->color);
+
 }
 
 void Bullet_update(Bullet* this) {

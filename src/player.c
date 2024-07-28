@@ -43,7 +43,7 @@ void Player_fire(Player* this, Texture2D* bullet_textures, Bullet** bullets) {
     if (Alarm_on_alarm(&this->fire_alarm, delta)) {
         /* void add_bullet(Bullet** bullets, Texture2D* textures, Vector2 pos, Bullet_type type) { */
         Bullet b = {0};
-        if (!Bullet_init(&b, bullet_textures, BT_0)) {
+        if (!Bullet_init(&b, bullet_textures, BT_0, BC_CYAN)) {
             log_warning("Failed to init bullet in %s()!", __func__);
         }
         b.pos = this->pos;

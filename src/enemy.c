@@ -7,7 +7,7 @@ void default_pattern(Enemy* this, Texture2D* bullet_textures, Bullet** bullets) 
     this->bullet_count = 5;
     for (size_t i = 0; i < this->bullet_count; ++i) {
         Bullet b = {0};
-        if (!Bullet_init(&b, bullet_textures, BT_0)) {
+        if (!Bullet_init(&b, bullet_textures, BT_0, BC_CYAN)) {
             log_warning("Failed to init bullet in %s()!", __func__);
         }
         b.pos = this->pos;
@@ -26,7 +26,7 @@ void pattern1(Enemy* this, Texture2D* bullet_textures, Bullet** bullets) {
     this->bullet_count = 8;
     for (size_t i = 0; i < this->bullet_count; ++i) {
         Bullet b = {0};
-        if (!Bullet_init(&b, bullet_textures, BT_0)) {
+        if (!Bullet_init(&b, bullet_textures, BT_0, BC_CYAN)) {
             log_warning("Failed to init bullet in %s()!", __func__);
         }
         b.pos = this->pos;
@@ -45,7 +45,7 @@ void pattern2(Enemy* this, Texture2D* bullet_textures, Bullet** bullets) {
     this->bullet_count = 20;
     for (size_t i = 0; i < this->bullet_count; ++i) {
         Bullet b = {0};
-        if (!Bullet_init(&b, bullet_textures, BT_0)) {
+        if (!Bullet_init(&b, bullet_textures, BT_0, BC_PINK)) {
             log_warning("Failed to init bullet in %s()!", __func__);
         }
         b.pos = this->pos;
