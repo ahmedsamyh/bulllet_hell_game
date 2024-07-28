@@ -37,7 +37,7 @@ struct Bullet {
 bool Bullet_init(Bullet* this, Texture2D* textures, Bullet_type type, Bullet_color color);
 void Bullet_set_type(Bullet* this, Texture2D* textures, Bullet_type type, Bullet_color color);
 void Bullet_update(Bullet* this);
-void Bullet_draw(Bullet* this);
+void Bullet_draw(Bullet* this, bool debug);
 void Bullet_set_speed(Bullet* this, float min, float max, float curr, float delta);
 void Bullet_deinit(Bullet* this);
 

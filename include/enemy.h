@@ -19,7 +19,7 @@ struct Enemy {
 bool Enemy_init(Enemy* this, Texture2D tex, size_t hframes, size_t vframes);
 void Enemy_update(Enemy* this);
 void Enemy_fire(Enemy* this, Texture2D* bullet_textures, Bullet** bullets);
-void Enemy_draw(Enemy* this);
+void Enemy_draw(Enemy* this, bool debug);
 void Enemy_deinit(Enemy* this);
 
 // PATTERNS

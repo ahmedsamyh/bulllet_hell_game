@@ -8,13 +8,17 @@ bool Player_init(Player* this, Texture2D tex, size_t hframes, size_t vframes) {
 
    this->speed = PLAYER_DEFAULT_SPEED;
 
-   this->keys[ECK_RIGHT] = KEY_D;
-   this->keys[ECK_LEFT]  = KEY_A;
-   this->keys[ECK_UP]    = KEY_W;
-   this->keys[ECK_DOWN]  = KEY_S;
-   this->keys[ECK_FIRE]  = KEY_SPACE;
+   this->keys[ECK_RIGHT] = KEY_RIGHT;
+   this->keys[ECK_LEFT]  = KEY_LEFT;
+   this->keys[ECK_UP]    = KEY_UP;
+   this->keys[ECK_DOWN]  = KEY_DOWN;
+   this->keys[ECK_FIRE]  = KEY_Z;
 
+   this->hitbox = PLAYER_HITBOX;
    this->fire_alarm.alarm_time = PLAYER_FIRE_RATE;
+
+   arrput(this->collide_ids, CID_PLAYER);
+
    return true;
 }
 
@@ -30,8 +34,8 @@ void Player_update(Player* this) {
     }
 }
 
-void Player_draw(Player* this) {
-    Entity_draw((Entity*)this);
+void Player_draw(Player* this, bool debug) {
+    Entity_draw((Entity*)this, debug);
 }
 
 void Player_control(Player* this) {

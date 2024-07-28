@@ -15,6 +15,8 @@
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Game");
 
+    bool DEBUG_DRAW = false;
+
     Bullet* bullets = NULL; // dynamic-array
     Texture2D* bullet_textures = NULL; // dynamic-array
     Enemy* enemies  = NULL; // dynamic-array
@@ -45,6 +47,9 @@ int main(void) {
         panic("Failed to init player!");
     }
 
+    Texture2D entity_tex = LoadTexture("resources/gfx/entity.png");
+    ASSERT(IsTextureReady(entity_tex));
+
     player.pos.x = WIDTH*0.5f;
     player.pos.y = HEIGHT*0.75f;
 
@@ -63,9 +68,12 @@ int main(void) {
             }
 
             // DEBUG
+            if (IsKeyPressed(KEY_TAB)) {
+                DEBUG_DRAW = !DEBUG_DRAW;
+            }
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 Enemy e = {0};
-                if (!Enemy_init(&e, tex, 1, 1)) {
+                if (!Enemy_init(&e, entity_tex, 1, 1)) {
                     CloseWindow();
                 }
                 e.pos = mpos;
@@ -92,7 +100,8 @@ int main(void) {
             for (int i = arrlenu(bullets)-1; i >= 0; --i) {
                 Bullet* b = &bullets[i];
                 Bullet_update(b);
-                if (!CheckCollisionPointRec(b->pos, play_rect)) {
+                if (!CheckCollisionPointRec(b->pos, play_rect) ||
+                    Entity_collide((Entity*)b, (Entity*)&player)) {
                     b->despawning = true;
                 }
                 if (b->despawned) {
@@ -114,18 +123,18 @@ int main(void) {
             }
 
             /////////////////////DRAW/////////////////////////
-            Player_draw(&player);
+            Player_draw(&player, DEBUG_DRAW);
 
             // ENEMY DRAW
             for (int i = arrlenu(enemies)-1; i >= 0; --i) {
                 Enemy* e = &enemies[i];
-                Enemy_draw(e);
+                Enemy_draw(e, DEBUG_DRAW);
             }
 
             // BULLET DRAW
             for (int i = arrlenu(bullets)-1; i >= 0; --i) {
                 Bullet* b = &bullets[i];
-                Bullet_draw(b);
+                Bullet_draw(b, DEBUG_DRAW);
             }
 
             Arena_reset(&str_arena);

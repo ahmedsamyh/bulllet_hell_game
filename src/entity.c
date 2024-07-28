@@ -12,6 +12,8 @@ bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes) {
     this->spr.scale = CLITERAL(Vector2) {2.f, 2.f};
     this->spr.tint.a = 0.f;
 
+    this->hitbox = 8.f; // TODO: hardcode
+
     this->keys[ECK_RIGHT] = KEY_D;
     this->keys[ECK_LEFT]  = KEY_A;
     this->keys[ECK_UP]    = KEY_W;
@@ -60,9 +62,14 @@ void Entity_control(Entity* this) {
     this->dir = dir;
 }
 
-void Entity_draw(Entity* this) {
+void Entity_draw(Entity* this, bool debug) {
     this->spr.pos = this->pos;
     Sprite_draw(&this->spr);
+
+    if (debug) {
+        // RLAPI void DrawCircleV(Vector2 center, float radius, Color color);                                       // Draw a color-filled circle (Vector version)
+        DrawCircleV(this->pos, this->hitbox, ColorAlpha(RED, 0.5f));
+    }
 }
 
 void Entity_spawn(Entity* this) {
@@ -91,6 +98,20 @@ void Entity_despawn(Entity* this) {
     }
 }
 
+bool Entity_collide(Entity* this, Entity* other) {
+    // TODO: optimize?
+    for (size_t i = 0; i < arrlenu(this->collide_masks); ++i) {
+        for (size_t j = 0; j < arrlenu(other->collide_ids); ++j) {
+            if (this->collide_masks[i] == other->collide_ids[j]) {
+                return CheckCollisionCircles(this->pos, this->hitbox, other->pos, other->hitbox);
+            }
+        }
+    }
+    return false;
+}
+
 void Entity_deinit(Entity* this) {
-   Sprite_deinit(&this->spr);
+    Sprite_deinit(&this->spr);
+    arrfree(this->collide_masks);
+    arrfree(this->collide_ids);
 }

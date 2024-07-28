@@ -48,8 +48,8 @@ void Bullet_update(Bullet* this) {
     }
 }
 
-void Bullet_draw(Bullet* this) {
-   Entity_draw((Entity*)this);
+void Bullet_draw(Bullet* this, bool debug) {
+   Entity_draw((Entity*)this, debug);
 }
 
 void Bullet_deinit(Bullet* this) {
