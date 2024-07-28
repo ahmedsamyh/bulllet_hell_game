@@ -25,12 +25,10 @@ enum Bullet_color {
 };
 
 struct Bullet {
-    ENTITY_MEMBERS();
-    float max_speed, min_speed;
-    float speed_delta;
-    float angle;
+    MOVING_OBJECT_MEMBERS();
     Bullet_type type;
     Bullet_color color;
+
 };
 
 // param:textures is dynamic-array

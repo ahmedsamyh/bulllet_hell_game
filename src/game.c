@@ -6,6 +6,7 @@
 #include <entity.h>
 #include <player.h>
 #include <bullet.h>
+#include <shot.h>
 #include <enemy.h>
 #include <common.h>
 
@@ -18,6 +19,7 @@ int main(void) {
     bool DEBUG_DRAW = false;
 
     Bullet* bullets = NULL; // dynamic-array
+    Shot*   shots = NULL; // dynamic-array
     Texture2D* bullet_textures = NULL; // dynamic-array
     Enemy* enemies  = NULL; // dynamic-array
 
@@ -47,6 +49,8 @@ int main(void) {
         panic("Failed to init player!");
     }
 
+    Texture2D shot_tex = LoadTexture("resources/gfx/player_shot.png");
+
     Texture2D entity_tex = LoadTexture("resources/gfx/entity.png");
     ASSERT(IsTextureReady(entity_tex));
 
@@ -64,7 +68,7 @@ int main(void) {
             Entity_control_physics((Entity*)&player);
             Player_update(&player);
             if (IsKeyDown(player.keys[ECK_FIRE])) {
-                Player_fire(&player, bullet_textures, &bullets);
+                Player_fire(&player, shot_tex, &shots);
             }
 
             // DEBUG
@@ -109,6 +113,19 @@ int main(void) {
                 }
             }
 
+            // SHOT UPDATE
+            for (int i = arrlenu(shots)-1; i >= 0; --i) {
+                Shot* sh = &shots[i];
+                Shot_update(sh);
+                if (!CheckCollisionPointRec(sh->pos, play_rect) ||
+                    Entity_collide((Entity*)sh, (Entity*)&player)) {
+                    sh->despawning = true;
+                }
+                if (sh->despawned) {
+                    arrdel(shots, i);
+                }
+            }
+
             // ENEMY UPDATE
             for (int i = arrlenu(enemies)-1; i >= 0; --i) {
                 Enemy* e = &enemies[i];
@@ -137,6 +154,12 @@ int main(void) {
                 Bullet_draw(b, DEBUG_DRAW);
             }
 
+            // SHOT DRAW
+            for (int i = arrlenu(shots)-1; i >= 0; --i) {
+                Shot* sh = &shots[i];
+                Shot_draw(sh, DEBUG_DRAW);
+            }
+
             Arena_reset(&str_arena);
             begin_text_line();
             draw_fps(&str_arena);
@@ -144,11 +167,19 @@ int main(void) {
             draw_text_line(pos_str, 20, WHITE);
             cstr bullets_count_str = Arena_alloc_str(str_arena, "bullets: %zu", arrlenu(bullets));
             draw_text_line(bullets_count_str, 20, WHITE);
+            cstr shots_count_str = Arena_alloc_str(str_arena, "shots: %zu", arrlenu(shots));
+            draw_text_line(shots_count_str, 20, WHITE);
+
+            // DEBUG
+            if (DEBUG_DRAW) {
+                DrawRectangleLinesEx(play_rect, 2.f, BLUE);
+            }
 
         EndDrawing();
     }
 
     arrfree(bullets);
+    arrfree(shots);
     arrfree(enemies);
     arrfree(bullet_textures);
     Player_deinit(&player);

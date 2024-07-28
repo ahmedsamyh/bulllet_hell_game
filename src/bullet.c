@@ -3,7 +3,7 @@
 #include <momomath.h>
 
 bool Bullet_init(Bullet* this, Texture2D* textures, Bullet_type type, Bullet_color color) {
-    Entity_init((Entity*)this, textures[0], 1, 1);
+    if (!Entity_init((Entity*)this, textures[0], 1, 1)) { return false; }
 
     Bullet_set_speed(this, BULLET_DEFAULT_MIN_SPEED, BULLET_DEFAULT_MAX_SPEED, ENTITY_DEFAULT_SPEED+randomf(-100.f, 100.f), 0.f);
     Bullet_set_type(this, textures, type, color);
@@ -35,7 +35,8 @@ void Bullet_update(Bullet* this) {
     if (this->spawning && !this->spawned) {
         Entity_spawn((Entity*)this);
     }
-    if (this->spawned && !this->spawning && !this->despawned && !this->despawning) {
+    if ((!this->spawning_move && (this->spawned && !this->spawning && !this->despawned && !this->despawning)) ||
+            this->spawning_move) {
         float delta = GetFrameTime();
         this->dir = vector2_from_degrees(this->angle);
         this->speed += this->speed_delta * delta;
