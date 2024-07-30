@@ -6,6 +6,10 @@
 #define WIDTH 1280
 #define HEIGHT 960
 
+#define TILE_SIZE 32
+#define COLS (WIDTH/TILE_SIZE)
+#define ROWS (HEIGHT/TILE_SIZE)
+
 #define ENTITY_DEFAULT_SPEED 200.f
 #define ENTITY_MEMBERS() \
     KeyboardKey keys[ECK_COUNT];\
