@@ -9,6 +9,10 @@ bool Shot_init(Shot* this, Texture2D texture) {
 
     this->angle = -90.f;
     this->spawning_move = true;
+
+    arrput(this->collide_ids, CID_PLAYER_BULLET);
+    arrput(this->collide_masks, CID_ENEMY);
+
     return true;
 }
 

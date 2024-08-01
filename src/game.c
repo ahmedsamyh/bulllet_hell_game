@@ -231,9 +231,16 @@ int main(void) {
                 for (int i = arrlenu(shots)-1; i >= 0; --i) {
                     Shot* sh = &shots[i];
                     Shot_update(sh);
-                    if (!CheckCollisionPointRec(sh->pos, play_rect) ||
-                        Entity_collide((Entity*)sh, (Entity*)&player)) {
+                    if (!CheckCollisionPointRec(sh->pos, play_rect)) {
                         sh->despawning = true;
+                    }
+                    // COLLIDE SHOT ENEMY
+                    for (size_t j = 0; j < arrlenu(enemies); ++j) {
+                        Enemy* e = &enemies[j];
+                        if (Entity_collide((Entity*)sh, (Entity*)e)) {
+                            sh->despawning = true;
+                            Entity_damage((Entity*)e, sh->attack_points);
+                        }
                     }
                     if (sh->despawned) {
                         arrdel(shots, i);

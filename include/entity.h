@@ -29,9 +29,11 @@ void Entity_apply_force(Entity* this, Vector2 force);
 void Entity_update(Entity* this);
 void Entity_draw(Entity* this, bool debug);
 void Entity_control(Entity* this);
+void Entity_damage(Entity* this, float attack_points);
 void Entity_spawn(Entity* this);
 void Entity_despawn(Entity* this);
 bool Entity_collide(Entity* this, Entity* other);
+void Entity_init_health(Entity* this, float max_health);
 void Entity_deinit(Entity* this);
 
 #endif // _ENTITY_H_

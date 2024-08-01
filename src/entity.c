@@ -19,6 +19,9 @@ bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes) {
     this->keys[ECK_UP]    = KEY_W;
     this->keys[ECK_DOWN]  = KEY_S;
 
+    Entity_init_health(this, 10.f);
+    this->attack_points = 1.f;
+
     return true;
 }
 
@@ -62,6 +65,13 @@ void Entity_control(Entity* this) {
     this->dir = dir;
 }
 
+void Entity_damage(Entity* this, float attack_points) {
+    this->health -= attack_points;
+    if (this->health <= 0.f) {
+        this->despawning = true;
+    }
+}
+
 void Entity_draw(Entity* this, bool debug) {
     this->spr.pos = this->pos;
     Sprite_draw(&this->spr);
@@ -99,6 +109,8 @@ void Entity_despawn(Entity* this) {
 }
 
 bool Entity_collide(Entity* this, Entity* other) {
+    if (!this->spawned || this->spawning || this->despawning || this->despawned ||
+        !this->spawned || this->spawning || this->despawning || this->despawned) return false;
     // TODO: optimize?
     for (size_t i = 0; i < arrlenu(this->collide_masks); ++i) {
         for (size_t j = 0; j < arrlenu(other->collide_ids); ++j) {
@@ -108,6 +120,11 @@ bool Entity_collide(Entity* this, Entity* other) {
         }
     }
     return false;
+}
+
+void Entity_init_health(Entity* this, float max_health) {
+    this->health = max_health;
+    this->max_health = max_health;
 }
 
 void Entity_deinit(Entity* this) {

@@ -75,6 +75,8 @@ bool Enemy_init(Enemy* this, Texture2D tex, size_t hframes, size_t vframes) {
     this->bullet_count = 5;
     this->die_alarm.alarm_time = 3.f;
 
+    arrput(this->collide_ids, CID_ENEMY);
+
     return true;
 }
 

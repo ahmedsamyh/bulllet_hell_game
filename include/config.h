@@ -21,7 +21,9 @@
     Alarm fire_alarm;\
     float hitbox;\
     int* collide_masks;\
-    int* collide_ids
+    int* collide_ids;\
+    float health,  max_health;\
+    float attack_points
 
 #define PLAYER_DEFAULT_SPEED 200.f
 #define PLAYER_FIRE_RATE 0.075f
@@ -37,6 +39,8 @@
 ENUM(Collide_id);
 enum Collide_id {
     CID_PLAYER,
+    CID_PLAYER_BULLET,
+    CID_ENEMY,
     CID_ENEMY_BULLET,
     CID_COUNT
 };
