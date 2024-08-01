@@ -9,6 +9,7 @@
 #include <shot.h>
 #include <enemy.h>
 #include <common.h>
+#include <spawner.h>
 
 #define COMMONLIB_IMPLEMENTATION
 #include <commonlib.h>
@@ -58,6 +59,7 @@ int main(void) {
     Shot*   shots = NULL; // dynamic-array
     Texture2D* bullet_textures = NULL; // dynamic-array
     Enemy* enemies  = NULL; // dynamic-array
+    Spawner* spawners  = NULL; // dynamic-array
 
     Rectangle play_rect = {
         .x = 20.f,
@@ -68,6 +70,11 @@ int main(void) {
 
     State state = STATE_PLAY;
     bool paused = false;
+
+    float play_time = 0.f;
+    float edit_time = 0.f;
+    float edit_time_paused = true;
+    Vector2 edit_cursor = {0};
 
     Arena str_arena = Arena_make(0);
 
@@ -88,6 +95,8 @@ int main(void) {
         panic("Failed to init player!");
     }
 
+
+    Texture2D spawner_tex = LoadTexture("resources/gfx/spawner.png");
     Texture2D shot_tex = LoadTexture("resources/gfx/player_shot.png");
 
     Texture2D entity_tex = LoadTexture("resources/gfx/entity.png");
@@ -113,15 +122,85 @@ int main(void) {
             if (IsKeyPressed(KEY_GRAVE)) {
                 change_state(&state, (state+1) % STATE_COUNT);
             }
-            if (IsKeyPressed(KEY_SPACE)) {
+            if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_SPACE)) {
                 paused = !paused;
             }
 
             if (!paused) {
                 switch (state) {
                     case STATE_PLAY: {
+                        // DEBUG
+                        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                            Enemy e = {0};
+                            if (!Enemy_init(&e, entity_tex, 1, 1)) {
+                                CloseWindow();
+                            }
+                            e.pos = mpos;
+                            e.bullet_count = 100;
+
+                            if (IsKeyDown(KEY_ONE)) {
+                                e.pattern = pattern1;
+                            }
+
+                            if (IsKeyDown(KEY_TWO)) {
+                                e.pattern = pattern2;
+                            }
+
+                            arrput(enemies, e);
+                        }
+
+                        // SPAWNER SPAWN
+                        for (int i = arrlenu(spawners)-1; i >= 0; --i) {
+                            Spawner_spawn(&spawners[i], play_time);
+                            if (spawners[i].spawned) {
+                                arrdel(spawners, i);
+                            }
+                        }
+
+                        play_time += delta;
                      } break;
                     case STATE_EDIT: {
+                        edit_cursor.x = ((int)mpos.x / (int)TILE_SIZE) * TILE_SIZE;
+                        edit_cursor.y = ((int)mpos.y / (int)TILE_SIZE) * TILE_SIZE;
+
+                        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                            Spawner s = {0};
+                            Spawner_init(&s, spawner_tex, &bullets, &enemies, edit_time, edit_cursor);
+                            arrput(spawners, s);
+                        }
+
+                        if (!edit_time_paused) {
+                            edit_time += delta;
+                        }
+
+                        if (!IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_SPACE)) {
+                            edit_time_paused = !edit_time_paused;
+                        }
+
+                        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
+                            if (SaveFileData("spawners.data", spawners, arrlenu(spawners)*sizeof(Spawner))) {
+                                log_info("Saved %d bytes (%d spawners) to disk!", arrlenu(spawners)*sizeof(Spawner), arrlenu(spawners));
+                            } else {
+                                log_error("Couldn't save spawners to disk!");
+                            }
+                        }
+
+                        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_L)) {
+                            Spawner* old_spawners = spawners;
+                            int loaded_data_size;
+                            Spawner* loaded_spawners = (Spawner*)LoadFileData("spawners.data", &loaded_data_size);
+                            if (loaded_spawners) {
+                                log_info("Loaded %d bytes (%d spawners) from disk!", loaded_data_size, loaded_data_size / sizeof(Spawner));
+                                // TODO: Prompt user for deletion of current spawners
+                                arrfree(spawners);
+                                for (size_t i = 0; i < (loaded_data_size/sizeof(Spawner)); ++i) {
+                                    arrput(spawners, loaded_spawners[i]);
+                                }
+                                UnloadFileData((unsigned char*)loaded_spawners);
+                            } else {
+                                log_error("Failed to load spawners from disk!");
+                            }
+                        }
                      } break;
                     default: {
                         ASSERT(0 && "Unreachable");
@@ -133,26 +212,6 @@ int main(void) {
                 Player_update(&player);
                 if (IsKeyDown(player.keys[ECK_FIRE])) {
                     Player_fire(&player, shot_tex, &shots);
-                }
-
-                // DEBUG
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    Enemy e = {0};
-                    if (!Enemy_init(&e, entity_tex, 1, 1)) {
-                        CloseWindow();
-                    }
-                    e.pos = mpos;
-                    e.bullet_count = 100;
-
-                    if (IsKeyDown(KEY_ONE)) {
-                        e.pattern = pattern1;
-                    }
-
-                    if (IsKeyDown(KEY_TWO)) {
-                        e.pattern = pattern2;
-                    }
-
-                    arrput(enemies, e);
                 }
 
                 // BULLET UPDATE
@@ -199,6 +258,7 @@ int main(void) {
             /////////////////////DRAW/////////////////////////
             Arena_reset(&str_arena);
             begin_text_line();
+            draw_fps(&str_arena);
             switch (state) {
                 case STATE_PLAY: {
 
@@ -214,7 +274,7 @@ int main(void) {
                                 Vector2 b = {
                                     WIDTH, y * TILE_SIZE
                                 };
-                                DrawLineV(a, b, ColorAlpha(WHITE, 0.75f));
+                                DrawLineV(a, b, ColorAlpha(WHITE, 0.01f));
                             }
                             {
                                 Vector2 a = {
@@ -223,9 +283,23 @@ int main(void) {
                                 Vector2 b = {
                                     x * TILE_SIZE, HEIGHT
                                 };
-                                DrawLineV(a, b, ColorAlpha(WHITE, 0.75f));
+                                DrawLineV(a, b, ColorAlpha(WHITE, 0.01f));
                             }
                         }
+                    }
+                    // draw cursor
+                    DrawCircleV(edit_cursor, TILE_SIZE*0.25f, RED);
+
+                    // spawner count
+                    cstr spawners_count_str = Arena_alloc_str(str_arena, "spawners count: %zu", arrlenu(spawners));
+                    draw_text_line(spawners_count_str, 20, WHITE);
+
+                    cstr edit_time_str = Arena_alloc_str(str_arena, "time: %.3f %s", edit_time, (edit_time_paused ? "[PAUSED]" : ""));
+                    draw_text_line(edit_time_str, 20, WHITE);
+
+                    // SPAWNER DRAW
+                    for (size_t i = 0; i < arrlenu(spawners); ++i) {
+                        Spawner_draw(&spawners[i]);
                     }
                  } break;
                 default: {
@@ -258,9 +332,8 @@ int main(void) {
             if (DEBUG_DRAW) {
                 DrawRectangleLinesEx(play_rect, 2.f, BLUE);
             }
-            draw_fps(&str_arena);
-            cstr pos_str = Arena_alloc_str(str_arena, "pos: %f, %f", player.pos.x, player.pos.y);
-            draw_text_line(pos_str, 20, WHITE);
+            cstr play_time_str = Arena_alloc_str(str_arena, "play_time: %.2f", play_time);
+            draw_text_line(play_time_str, 20, WHITE);
             cstr bullets_count_str = Arena_alloc_str(str_arena, "bullets: %zu", arrlenu(bullets));
             draw_text_line(bullets_count_str, 20, WHITE);
             cstr shots_count_str = Arena_alloc_str(str_arena, "shots: %zu", arrlenu(shots));
