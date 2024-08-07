@@ -50,6 +50,12 @@ cstr state_as_str(State state) {
     return "INVALID STATE";
 }
 
+#define reset() do { \
+    edit_time = 0.f;\
+    edit_time_paused = true;\
+    play_time = 0.f;\
+} while (0)
+
 int main(void) {
     InitWindow(WIDTH, HEIGHT, "Game");
 
@@ -58,8 +64,9 @@ int main(void) {
     Bullet* bullets = NULL; // dynamic-array
     Shot*   shots = NULL; // dynamic-array
     Texture2D* bullet_textures = NULL; // dynamic-array
-    Enemy* enemies  = NULL; // dynamic-array
-    Spawner* spawners  = NULL; // dynamic-array
+    Enemy* enemies = NULL; // dynamic-array
+    Spawner* spawners = NULL; // dynamic-array
+    Spawner** selected_spawners = NULL; // dynamic-array
 
     Rectangle play_rect = {
         .x = 20.f,
@@ -75,6 +82,8 @@ int main(void) {
     float edit_time = 0.f;
     float edit_time_paused = true;
     Vector2 edit_cursor = {0};
+    Rectangle select_area = {0};
+    bool selecting = false;
 
     Arena str_arena = Arena_make(0);
 
@@ -94,7 +103,6 @@ int main(void) {
     if (!Player_init(&player, tex, 1, 1)) {
         panic("Failed to init player!");
     }
-
 
     Texture2D spawner_tex = LoadTexture("resources/gfx/spawner.png");
     Texture2D shot_tex = LoadTexture("resources/gfx/player_shot.png");
@@ -146,6 +154,10 @@ int main(void) {
                                 e.pattern = pattern2;
                             }
 
+                            if (IsKeyDown(KEY_THREE)) {
+                                e.pattern = pattern3;
+                            }
+
                             arrput(enemies, e);
                         }
 
@@ -163,20 +175,40 @@ int main(void) {
                         edit_cursor.x = ((int)mpos.x / (int)TILE_SIZE) * TILE_SIZE;
                         edit_cursor.y = ((int)mpos.y / (int)TILE_SIZE) * TILE_SIZE;
 
+                        // ADD SPAWNER
                         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                             Spawner s = {0};
                             Spawner_init(&s, spawner_tex, &bullets, &enemies, edit_time, edit_cursor);
                             arrput(spawners, s);
                         }
 
-                        if (!edit_time_paused) {
-                            edit_time += delta;
+                        // SELECT
+                        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+                            select_area.x = mpos.x;
+                            select_area.y = mpos.y;
                         }
 
-                        if (!IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_SPACE)) {
-                            edit_time_paused = !edit_time_paused;
+                        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+                            selecting = true;
+                            select_area.width = mpos.x - select_area.x;
+                            select_area.height = mpos.y - select_area.y;
                         }
 
+                        if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+                            // TODO: SELECT
+                            selecting = false;
+
+                            for (int i = 0; i < arrlen(spawners); ++i) {
+                                Spawner* s = &spawners[i];
+                                if (CheckCollisionPointRec(s->pos, select_area)) {
+                                    s->selected = true;
+                                } else {
+                                    s->selected = false;
+                                }
+                            }
+                        }
+
+                        // SAVE SPAWNER
                         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) {
                             if (SaveFileData("spawners.data", spawners, arrlenu(spawners)*sizeof(Spawner))) {
                                 log_info("Saved %d bytes (%d spawners) to disk!", arrlenu(spawners)*sizeof(Spawner), arrlenu(spawners));
@@ -185,6 +217,7 @@ int main(void) {
                             }
                         }
 
+                        // LOAD SPAWNER
                         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_L)) {
                             Spawner* old_spawners = spawners;
                             int loaded_data_size;
@@ -201,10 +234,19 @@ int main(void) {
                                 log_error("Failed to load spawners from disk!");
                             }
                         }
+
+                        if (!IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_SPACE)) {
+                            edit_time_paused = !edit_time_paused;
+                        }
+
                      } break;
                     default: {
                         ASSERT(0 && "Unreachable");
                      } break;
+                }
+
+                if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_R)) {
+                    reset();
                 }
 
                 Player_control(&player);
@@ -294,9 +336,6 @@ int main(void) {
                             }
                         }
                     }
-                    // draw cursor
-                    DrawCircleV(edit_cursor, TILE_SIZE*0.25f, RED);
-
                     // spawner count
                     cstr spawners_count_str = Arena_alloc_str(str_arena, "spawners count: %zu", arrlenu(spawners));
                     draw_text_line(spawners_count_str, 20, WHITE);
@@ -308,6 +347,14 @@ int main(void) {
                     for (size_t i = 0; i < arrlenu(spawners); ++i) {
                         Spawner_draw(&spawners[i]);
                     }
+
+                    // draw cursor
+                    DrawCircleV(edit_cursor, TILE_SIZE*0.25f, RED);
+
+                    if (selecting) {
+                        DrawRectangleLinesEx(select_area, 2.f, BLUE);
+                    }
+
                  } break;
                 default: {
                     ASSERT(0 && "Unreachable");
@@ -365,6 +412,8 @@ int main(void) {
     arrfree(shots);
     arrfree(enemies);
     arrfree(bullet_textures);
+    arrfree(spawners);
+    arrfree(selected_spawners);
     Player_deinit(&player);
     Arena_free(&str_arena);
     CloseWindow();

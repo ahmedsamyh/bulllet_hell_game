@@ -13,6 +13,7 @@ struct Enemy {
     void(*pattern)(Enemy*, Texture2D*, Bullet**);
     size_t bullet_count;
     float dataf[4];
+    int   datai[4];
     Alarm die_alarm; // TMP
 };
 
@@ -26,5 +27,6 @@ void Enemy_deinit(Enemy* this);
 PATTERN(default_pattern);
 PATTERN(pattern1);
 PATTERN(pattern2);
+PATTERN(pattern3);
 
 #endif // __ENEMY_H__

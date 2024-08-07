@@ -16,6 +16,7 @@ struct Spawner {
     Enemy** enemies;
     bool spawned;
     Sprite spr;
+    bool selected;
 };
 
 bool Spawner_init(Spawner* this, Texture2D tex, Bullet** bullets, Enemy** enemies, float time, Vector2 pos);

@@ -62,6 +62,32 @@ void pattern2(Enemy* this, Texture2D* bullet_textures, Bullet** bullets) {
     }
 }
 
+void pattern3(Enemy* this, Texture2D* bullet_textures, Bullet** bullets) {
+    float angle = this->dataf[0];
+    if (this->dataf[1] == 0.f) this->dataf[1] = 1.f;
+    if (this->datai[0] == 0) this->datai[0] = 10;
+    float angle_delta = this->dataf[1];
+    this->dataf[0] += angle_delta;
+    this->dataf[1] += 900.f * GetFrameTime();
+    if (angle_delta >= 5.f) this->datai[0]++;
+    this->fire_alarm.alarm_time = 0.2;
+    this->fire_count_max = 100;
+    this->bullet_count = this->datai[0];
+    for (size_t i = 0; i < this->bullet_count; ++i) {
+        Bullet b = {0};
+        if (!Bullet_init(&b, bullet_textures, BT_0, BC_GRAY)) {
+            log_warning("Failed to init bullet in %s()!", __func__);
+        }
+        b.pos = this->pos;
+        b.angle = angle;
+        Bullet_set_speed(&b, 50.f, 500.f, 50.f, 50.f);
+        angle += (360.f / this->bullet_count);
+        arrput(b.collide_masks, CID_PLAYER);
+        arrput(b.collide_ids, CID_ENEMY_BULLET);
+        arrput(*bullets, b);
+    }
+}
+
 bool Enemy_init(Enemy* this, Texture2D tex, size_t hframes, size_t vframes) {
     if (!Entity_init((Entity*)this, tex, hframes, vframes)) {
         return false;
