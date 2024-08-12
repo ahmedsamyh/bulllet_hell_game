@@ -25,7 +25,7 @@
     float health,  max_health;\
     float attack_points
 
-#define PLAYER_DEFAULT_SPEED 200.f
+#define PLAYER_DEFAULT_SPEED 400.f
 #define PLAYER_FIRE_RATE 0.075f
 #define PLAYER_HITBOX 2.f
 #define PLAYER_SHOT_MIN_SPEED   250.f

@@ -28,6 +28,7 @@ void change_state(State* current, State next) {
          } break;
         case STATE_EDIT: {
          } break;
+        case STATE_COUNT:
         default: {
              ASSERT(0 && "Unreachable!");
          } break;
@@ -42,6 +43,7 @@ cstr state_as_str(State state) {
          } break;
         case STATE_EDIT: {
             return "STATE_EDIT";
+        case STATE_COUNT:
          } break;
         default: {
              ASSERT(0 && "Unreachable!");
@@ -243,6 +245,7 @@ int main(void) {
                         }
 
                      } break;
+                    case STATE_COUNT:
                     default: {
                         ASSERT(0 && "Unreachable");
                      } break;
@@ -253,7 +256,6 @@ int main(void) {
                 }
 
                 Player_control(&player);
-                Entity_control_physics((Entity*)&player);
                 Player_update(&player);
                 bind_circle_to_rect(&player.pos, player.hitbox, play_rect);
                 if (IsKeyDown(player.keys[ECK_FIRE])) {
@@ -367,6 +369,7 @@ int main(void) {
                     }
 
                  } break;
+                case STATE_COUNT:
                 default: {
                     ASSERT(0 && "Unreachable");
                  } break;

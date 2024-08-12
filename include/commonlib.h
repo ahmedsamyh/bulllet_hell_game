@@ -4167,6 +4167,7 @@ void log_file(Log_type type, FILE* file, cstr fmt, ...) {
   case C_LOG_INFO: fprintf(file, "INFO: "); break;
   case C_LOG_ERROR: fprintf(file, "ERROR: "); break;
   case C_LOG_WARNING: fprintf(file, "WARNING: "); break;
+  case C_LOG_COUNT:
   default: ASSERT(0 && "Unreachable");
   }
 

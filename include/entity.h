@@ -15,6 +15,8 @@ enum Entity_Control_Key {
         ECK_DOWN,
         ECK_UP,
         ECK_FIRE,
+        ECK_ALT,
+        ECK_ANGLE,
         ECK_COUNT,
 };
 

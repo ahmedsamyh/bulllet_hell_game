@@ -18,6 +18,7 @@ bool Shot_init(Shot* this, Texture2D texture) {
 
 void Shot_update(Shot* this) {
     Bullet_update((Bullet*)this);
+    this->spr.rotation = this->angle + 90.f;
 }
 
 void Shot_draw(Shot* this, bool debug) {

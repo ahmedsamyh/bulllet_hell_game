@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -ggdb -Iinclude -Wno-unused-variable
+CFLAGS=-Wall -Wextra -ggdb -Iinclude -Wno-unused-variable -Wswitch-enum
 LIBS=-Llib -lraylib -lm
 SOURCES=src/*.c
 

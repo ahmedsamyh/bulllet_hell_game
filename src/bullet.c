@@ -23,6 +23,7 @@ void Bullet_set_type(Bullet* this, Texture2D* textures, Bullet_type type, Bullet
                        Sprite_init(&this->spr, textures[BT_0], BC_COUNT, 1);
                        Sprite_center_origin(&this->spr);
                    } break;
+        case BT_COUNT:
         default: {
                      ASSERT(0 && "Unreachable!");
                  } break;
