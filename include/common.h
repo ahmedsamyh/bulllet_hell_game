@@ -15,4 +15,7 @@ void draw_fps(Arena* str_arena);
 void begin_text_line(void);
 void draw_text_line(const char *text, int fontSize, Color color);
 
+void bind_point_to_rect(Vector2* point, Rectangle rect);
+void bind_circle_to_rect(Vector2* point, float radius, Rectangle rect);
+
 #endif // _COMMON_H_

@@ -66,7 +66,7 @@ int main(void) {
     Texture2D* bullet_textures = NULL; // dynamic-array
     Enemy* enemies = NULL; // dynamic-array
     Spawner* spawners = NULL; // dynamic-array
-    Spawner** selected_spawners = NULL; // dynamic-array
+    int* selected_spawner_ids = NULL; // dynamic-array
 
     Rectangle play_rect = {
         .x = 20.f,
@@ -82,7 +82,7 @@ int main(void) {
     float edit_time = 0.f;
     float edit_time_paused = true;
     Vector2 edit_cursor = {0};
-    Rectangle select_area = {0};
+    Vector2 select_area_start, select_area_end = {0};
     bool selecting = false;
 
     Arena str_arena = Arena_make(0);
@@ -184,19 +184,22 @@ int main(void) {
 
                         // SELECT
                         if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-                            select_area.x = mpos.x;
-                            select_area.y = mpos.y;
+                            select_area_start = mpos;
                         }
 
                         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                             selecting = true;
-                            select_area.width = mpos.x - select_area.x;
-                            select_area.height = mpos.y - select_area.y;
+                            select_area_end = mpos;
                         }
 
                         if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                            // TODO: SELECT
                             selecting = false;
+                            Rectangle select_area = {
+                                .x = fminf(select_area_start.x, select_area_end.x),
+                                .y = fminf(select_area_start.y, select_area_end.y),
+                                .width = (select_area_start.x < select_area_end.x ? select_area_end.x - select_area_start.x : select_area_start.x - select_area_end.x),
+                                .height = (select_area_start.y < select_area_end.y ? select_area_end.y - select_area_start.y : select_area_start.y - select_area_end.y),
+                            };
 
                             for (int i = 0; i < arrlen(spawners); ++i) {
                                 Spawner* s = &spawners[i];
@@ -252,6 +255,7 @@ int main(void) {
                 Player_control(&player);
                 Entity_control_physics((Entity*)&player);
                 Player_update(&player);
+                bind_circle_to_rect(&player.pos, player.hitbox, play_rect);
                 if (IsKeyDown(player.keys[ECK_FIRE])) {
                     Player_fire(&player, shot_tex, &shots);
                 }
@@ -352,6 +356,13 @@ int main(void) {
                     DrawCircleV(edit_cursor, TILE_SIZE*0.25f, RED);
 
                     if (selecting) {
+                        Rectangle select_area = {
+                            .x = fminf(select_area_start.x, select_area_end.x),
+                            .y = fminf(select_area_start.y, select_area_end.y),
+                            .width = (select_area_start.x < select_area_end.x ? select_area_end.x - select_area_start.x : select_area_start.x - select_area_end.x),
+                            .height = (select_area_start.y < select_area_end.y ? select_area_end.y - select_area_start.y : select_area_start.y - select_area_end.y),
+                        };
+
                         DrawRectangleLinesEx(select_area, 2.f, BLUE);
                     }
 
@@ -413,7 +424,7 @@ int main(void) {
     arrfree(enemies);
     arrfree(bullet_textures);
     arrfree(spawners);
-    arrfree(selected_spawners);
+    arrfree(selected_spawner_ids);
     Player_deinit(&player);
     Arena_free(&str_arena);
     CloseWindow();
