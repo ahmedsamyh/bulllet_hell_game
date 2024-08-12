@@ -10,14 +10,6 @@ bool Player_init(Player* this, Texture2D tex, size_t hframes, size_t vframes) {
    this->speed = PLAYER_DEFAULT_SPEED;
    this->alt_speed = this->speed * 0.5f;
 
-   this->keys[ECK_RIGHT] = KEY_RIGHT;
-   this->keys[ECK_LEFT]  = KEY_LEFT;
-   this->keys[ECK_UP]    = KEY_UP;
-   this->keys[ECK_DOWN]  = KEY_DOWN;
-   this->keys[ECK_FIRE]  = KEY_Z;
-   this->keys[ECK_ALT]   = KEY_LEFT_SHIFT;
-   this->keys[ECK_ANGLE] = KEY_X;
-
    this->hitbox = PLAYER_HITBOX;
    this->fire_alarm.alarm_time = PLAYER_FIRE_RATE;
 
@@ -48,10 +40,10 @@ void Player_update(Player* this) {
 
 void Player_angle(Player* this) {
     float delta = GetFrameTime();
-    if (IsKeyDown(this->keys[ECK_LEFT])) {
+    if (IsKeyDown(PLAYER_LEFT_KEY)) {
         this->angle -= this->angle_delta * delta * (this->alt ? 1.f : 2.f);
     }
-    if (IsKeyDown(this->keys[ECK_RIGHT])) {
+    if (IsKeyDown(PLAYER_RIGHT_KEY)) {
         this->angle += this->angle_delta * delta * (this->alt ? 1.f : 2.f);
     }
     this->spr.rotation = this->angle + 90.f;
@@ -62,9 +54,24 @@ void Player_draw(Player* this, bool debug) {
 }
 
 void Player_control(Player* this) {
-    Entity_control((Entity*)this);
-    this->alt = IsKeyDown(this->keys[ECK_ALT]);
-    this->angling = IsKeyDown(this->keys[ECK_ANGLE]);
+    Vector2 dir = {0};
+    if (IsKeyDown(PLAYER_LEFT_KEY)) {
+        dir.x--;
+    }
+    if (IsKeyDown(PLAYER_RIGHT_KEY)) {
+        dir.x++;
+    }
+    if (IsKeyDown(PLAYER_UP_KEY)) {
+        dir.y--;
+    }
+    if (IsKeyDown(PLAYER_DOWN_KEY)) {
+        dir.y++;
+    }
+    dir = Vector2Normalize(dir);
+    this->dir = dir;
+
+    this->alt = IsKeyDown(PLAYER_ALT_KEY);
+    this->angling = IsKeyDown(PLAYER_ANGLE_KEY);
 }
 
 void Player_fire(Player* this, Texture2D shot_texture, Shot** shots) {

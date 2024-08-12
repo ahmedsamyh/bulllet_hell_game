@@ -258,7 +258,7 @@ int main(void) {
                 Player_control(&player);
                 Player_update(&player);
                 bind_circle_to_rect(&player.pos, player.hitbox, play_rect);
-                if (IsKeyDown(player.keys[ECK_FIRE])) {
+                if (IsKeyDown(PLAYER_FIRE_KEY)) {
                     Player_fire(&player, shot_tex, &shots);
                 }
 

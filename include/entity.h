@@ -9,17 +9,6 @@
 STRUCT(Entity);
 ENUM(Entity_Control_Key);
 
-enum Entity_Control_Key {
-        ECK_LEFT,
-        ECK_RIGHT,
-        ECK_DOWN,
-        ECK_UP,
-        ECK_FIRE,
-        ECK_ALT,
-        ECK_ANGLE,
-        ECK_COUNT,
-};
-
 struct Entity {
     ENTITY_MEMBERS();
 };
@@ -30,7 +19,6 @@ void Entity_control_physics(Entity* this);
 void Entity_apply_force(Entity* this, Vector2 force);
 void Entity_update(Entity* this);
 void Entity_draw(Entity* this, bool debug);
-void Entity_control(Entity* this);
 void Entity_damage(Entity* this, float attack_points);
 void Entity_spawn(Entity* this);
 void Entity_despawn(Entity* this);

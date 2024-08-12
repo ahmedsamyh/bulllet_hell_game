@@ -14,11 +14,6 @@ bool Entity_init(Entity* this, Texture2D tex, size_t hframes, size_t vframes) {
 
     this->hitbox = 8.f; // TODO: hardcode
 
-    this->keys[ECK_RIGHT] = KEY_D;
-    this->keys[ECK_LEFT]  = KEY_A;
-    this->keys[ECK_UP]    = KEY_W;
-    this->keys[ECK_DOWN]  = KEY_S;
-
     Entity_init_health(this, 10.f);
     this->attack_points = 1.f;
 
@@ -47,24 +42,6 @@ void Entity_update(Entity* this) {
     (void)this;
 }
 
-void Entity_control(Entity* this) {
-    Vector2 dir = {0};
-    if (IsKeyDown(this->keys[ECK_LEFT])) {
-        dir.x--;
-    }
-    if (IsKeyDown(this->keys[ECK_RIGHT])) {
-        dir.x++;
-    }
-    if (IsKeyDown(this->keys[ECK_UP])) {
-        dir.y--;
-    }
-    if (IsKeyDown(this->keys[ECK_DOWN])) {
-        dir.y++;
-    }
-    dir = Vector2Normalize(dir);
-    this->dir = dir;
-}
-
 void Entity_damage(Entity* this, float attack_points) {
     this->health -= attack_points;
     if (this->health <= 0.f) {
@@ -77,7 +54,6 @@ void Entity_draw(Entity* this, bool debug) {
     Sprite_draw(&this->spr);
 
     if (debug) {
-        // RLAPI void DrawCircleV(Vector2 center, float radius, Color color);                                       // Draw a color-filled circle (Vector version)
         DrawCircleV(this->pos, this->hitbox, ColorAlpha(RED, 0.5f));
     }
 }

@@ -12,7 +12,6 @@
 
 #define ENTITY_DEFAULT_SPEED 200.f
 #define ENTITY_MEMBERS() \
-    KeyboardKey keys[ECK_COUNT];\
     Vector2 pos, vel, acc, dir;\
     float speed;\
     Sprite spr;\
@@ -32,6 +31,15 @@
 #define PLAYER_SHOT_MAX_SPEED   750.f
 #define PLAYER_SHOT_SPEED       750.f
 #define PLAYER_SHOT_SPEED_DELTA -200.f
+
+#define PLAYER_FIRE_KEY KEY_Z
+#define PLAYER_RIGHT_KEY KEY_RIGHT
+#define PLAYER_LEFT_KEY KEY_LEFT
+#define PLAYER_UP_KEY   KEY_UP
+#define PLAYER_DOWN_KEY KEY_DOWN
+#define PLAYER_FIRE_KEY KEY_Z
+#define PLAYER_ALT_KEY  KEY_LEFT_SHIFT
+#define PLAYER_ANGLE_KEY KEY_X
 
 #define BULLET_DEFAULT_MIN_SPEED 0.f
 #define BULLET_DEFAULT_MAX_SPEED 500.f
